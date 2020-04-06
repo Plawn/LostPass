@@ -1,14 +1,34 @@
+# build environment
+FROM node:alpine as builder
+
+WORKDIR /app
+
+COPY frontend/package.json .
+
+RUN yarn install --ignore-optional --frozen-lockfile 
+
+COPY ./frontend/ .
+RUN yarn build
+
+# production environment
 FROM python:3.7.2-slim
 
 WORKDIR /api
 
-COPY requirements.txt requirements.txt
+RUN apt update \
+    && apt install nginx -y 
+
+COPY --from=builder app/build/ /usr/share/nginx/html/
+COPY default.conf /etc/nginx/conf.d/default.conf
+
+COPY backend/requirements.txt requirements.txt
 
 RUN pip3 install -r requirements.txt
 
-COPY . .
+COPY ./backend/ .
 
-EXPOSE 5000
+EXPOSE 4000
 
-# need to add a real wsgi server after
-ENTRYPOINT ["python3", "start.py", "5000"]
+COPY entry-point.sh /usr/bin/entry-point.sh
+
+CMD [ "/usr/bin/entry-point.sh" ]

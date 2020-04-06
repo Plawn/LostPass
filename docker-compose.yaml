@@ -1,0 +1,13 @@
+version: '3'
+services: 
+    redis:
+      image: "redis:latest"
+    plawnpass:
+      build: .
+      image: plawnpass
+      ports:
+        - "5000:4000"
+      environment:
+        - REDIS_HOST=redis
+      depends_on:
+        - redis
