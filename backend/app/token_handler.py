@@ -27,14 +27,17 @@ class TokenHandler:
     def __make_redis_storage_key(self) -> str:
         return self.__redis_conf.prefix + uuid.uuid4().hex
 
-    def set_content(self, content: str, ttl: int) -> str:
+    def set_content(self, content: str, ttl: int=1, expires=True) -> str:
         """
         Sets the content in the redis and returns a token to access it
         """
         storage_key = self.__make_redis_storage_key()
         encrypted_password, encryption_key = self.__crypto_engine.encrypt(
             content.encode('utf-8'))
-        self.__redis_conf.redis.setex(storage_key, ttl, encrypted_password)
+        if expires:
+            self.__redis_conf.redis.setex(storage_key, ttl, encrypted_password)
+        else:
+            self.__redis_conf.redis.set(storage_key, encrypted_password)
         return self.TOKEN_SEPARATOR.join([storage_key, encryption_key.decode('utf-8')])
 
     def is_token_valid(self, token: str) -> bool:

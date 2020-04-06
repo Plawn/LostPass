@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Typography, IconButton, Box } from '@material-ui/core';
+import { Typography, IconButton } from '@material-ui/core';
 import { LoadingComponent } from '../common/LoadingComponent/LoadingComponent';
 import { createToken } from '../../api/api';
 import SelectField from '../common/form/SelectField/SelectField';
@@ -9,12 +9,13 @@ import { range } from '../../utils/utils';
 import FileCopyOutlinedIcon from '@material-ui/icons/FileCopyOutlined';
 import Button from '../common/Button/Button';
 import TextField from '../common/form/TextField/TextField';
-
+import CopyToClipboard from 'react-copy-to-clipboard';
 
 const durationOptions = [
     { label: 'Hour', value: 3600 },
     { label: 'Day', value: 3600 * 24 },
     { label: 'Week', value: 3600 * 24 * 7 },
+    { label: 'Never', value: 0 },
 ]
 
 const linksNumberOptions = range(10, 1).map(i => ({ label: `${i}`, value: i }));
@@ -30,13 +31,15 @@ const TokenComponent = ({ url }: { url: string }) => {
 
     return (
         <div style={{ display: 'flex' }}>
-            <TextField value={url} 
-            style={{ width: '100%' }}
+            <TextField value={url}
+                style={{ width: '100%' }}
                 InputProps={{ readOnly: true }}
             />
-            <IconButton onClick={copyToClipboard} component="span">
-                <FileCopyOutlinedIcon />
-            </IconButton>
+            <CopyToClipboard text={url}>
+                <IconButton onClick={copyToClipboard} component="span">
+                    <FileCopyOutlinedIcon />
+                </IconButton>
+            </CopyToClipboard>
         </div>
     )
 }
@@ -58,7 +61,7 @@ const TokenForm = ({ setTokens, setLoading }: { setTokens: any, setLoading: any 
         setTokens([]);
         setLoading(true);
         try {
-            const tokens = await createToken(content, ttl!, linksNumber);
+            const tokens = await createToken(content, ttl, linksNumber);
             setTokens(tokens);
         } catch (e) {
 
@@ -74,7 +77,7 @@ const TokenForm = ({ setTokens, setLoading }: { setTokens: any, setLoading: any 
             <Formik
                 initialValues={initialValues}
                 onSubmit={async values => {
-                    values.ttl && handleTokenCreation(values.content, +values.ttl, +values.linksNumber);
+                    values.ttl !== undefined && handleTokenCreation(values.content, +values.ttl, +values.linksNumber);
                 }}
                 render={(values) =>
                     <Form>

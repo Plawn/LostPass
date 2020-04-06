@@ -16,11 +16,13 @@ token_handler = TokenHandler(redis=redis_conf, crypto_engine=engine)
 SELF_SERVED = os.environ.get('SELF_SERVED', False) in ('True', 'true')
 
 if SELF_SERVED:
-    logging.info('Flask is serving the frontend -> not the most performant way to do it !')
+    logging.info(
+        'Flask is serving the frontend -> not the most performant way to do it !')
 
 
 def make_error(msg: str, code=400):
     return jsonify({'error': msg}), code
+
 
 if SELF_SERVED:
     @app.route('/', defaults={'path': ''})
@@ -39,11 +41,11 @@ def create_token():
     content = js.get('content')
     ttl = int(js.get('ttl', -1))
     multi_links = int(js.get('links_number', 1))
-    if content is None or ttl < 1:
+    if content is None or ttl == -1:
         return make_error('missiong field')
     return jsonify({
         'tokens': [
-            token_handler.set_content(content, ttl) for _ in range(multi_links)
+            token_handler.set_content(content, ttl, expires=ttl != 0) for _ in range(multi_links)
         ]
     })
 

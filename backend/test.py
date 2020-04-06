@@ -28,13 +28,13 @@ def create_token(content: str) -> str:
 
 
 def preview_token(token: str) -> bool:
-    r = requests.get(url+'/api/preview/'+quote(token))
+    r = requests.get(url+'/api/preview/' + quote(token))
     if r.status_code < 300:
         return r.json()['valid']
 
 
 def view_token(token: str) -> str:
-    r = requests.get(url+'/api/view/'+quote(token))
+    r = requests.get(url+'/api/view/' + quote(token))
     if r.status_code < 300:
         return r.json()['content']
     

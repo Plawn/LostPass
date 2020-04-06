@@ -1,7 +1,7 @@
-import React, { useState, useEffect, ReactNode } from 'react';
+import React, { useState, useEffect, ReactNode, useCallback } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { LoadingComponent } from '../common/LoadingComponent/LoadingComponent';
-import { Typography, IconButton } from '@material-ui/core';
+import { Typography } from '@material-ui/core';
 import MultiLineTextField from '../common/form/MultiLineTextField/MultiLineTextField';
 import { retrieveContent, verifyToken } from '../../api/api';
 import Button from '../common/Button/Button';
@@ -74,12 +74,14 @@ const ValidToken = ({ token }: { token: string }) => {
     )
 }
 
+const TokenViewer = ({ valid, token }: { valid?: boolean; token: string }) => (valid !== undefined ? (valid ? <ValidToken token={token} /> : <InvalidToken />) : null)
+
 const ViewToken = (props: Props) => {
     const token = props.match.params.token;
     const [loading, setLoading] = useState(false);
-    const [valid, setValid] = useState(false);
+    const [valid, setValid] = useState<boolean | undefined>(undefined);
 
-    const loadData = async () => {
+    const loadData = useCallback(async () => {
         setLoading(true);
         try {
             const isValid = await verifyToken(token);
@@ -88,15 +90,15 @@ const ViewToken = (props: Props) => {
 
         }
         setLoading(false);
-    };
+    }, [token]);
 
     useEffect(() => {
         loadData();
-    }, []);
+    }, [loadData]);
 
     return (
         <LoadingComponent loading={loading}>
-            {valid ? <ValidToken token={token} /> : <InvalidToken />}
+            <TokenViewer valid={valid} token={token} />
         </LoadingComponent>
     )
 }
