@@ -1,18 +1,36 @@
-from flask import Flask, request, jsonify
-from .crypto_engine import CyptoEngine
-from .token_handler import TokenHandler
-from .ressources import redis_conf
-from werkzeug.urls import url_unquote_plus
 import logging
+import os
 
-app = Flask(__name__)
+from flask import Flask, jsonify, request, send_from_directory
+from werkzeug.urls import url_unquote_plus
+
+from .crypto_engine import CyptoEngine
+from .ressources import redis_conf
+from .token_handler import TokenHandler
+
+app = Flask(__name__, static_folder='../../frontend/build')
 
 engine = CyptoEngine()
 token_handler = TokenHandler(redis=redis_conf, crypto_engine=engine)
 
+SELF_SERVED = os.environ.get('SELF_SERVED', False) in ('True', 'true')
+
+if SELF_SERVED:
+    logging.info('Flask is serving the frontend -> not the most performant way to do it !')
+
 
 def make_error(msg: str, code=400):
     return jsonify({'error': msg}), code
+
+if SELF_SERVED:
+    @app.route('/', defaults={'path': ''})
+    @app.route('/<path:path>')
+    def serve(path: str):
+        print('path', app.static_folder + '/' + path)
+        if path != "" and os.path.exists(app.static_folder + '/' + path):
+            return send_from_directory(app.static_folder, path)
+        else:
+            return send_from_directory(app.static_folder, 'index.html')
 
 
 @app.route('/api/new', methods=['POST'])
