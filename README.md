@@ -5,6 +5,6 @@ Based on https://github.com/pinterest/snappass
 
 
 
-Does the same thing but better
+Does the same thing but can be used as a jsonApi too
 
-Support illimted lifetime secret
+- Supports illimted lifetime secret
