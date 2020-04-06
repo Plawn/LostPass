@@ -21,7 +21,6 @@ def create_token():
     content = js.get('content')
     ttl = int(js.get('ttl', -1))
     multi_links = int(js.get('links_number', 1))
-    logging.info('redis live', redis_conf.redis.ping())
     if content is None or ttl < 1:
         return make_error('missiong field')
     return jsonify({

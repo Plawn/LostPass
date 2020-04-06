@@ -14,7 +14,6 @@ else:
     redis_client = redis.StrictRedis(
         host=redis_host, port=redis_port, db=redis_db)
 
-
 REDIS_PREFIX = os.environ.get('REDIS_PREFIX', 'snappass')
 
 redis_conf = RedisConf(redis_client, REDIS_PREFIX)
