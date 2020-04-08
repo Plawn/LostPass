@@ -36,7 +36,7 @@ const TokenComponent = ({ url }: { url: string }) => {
                 InputProps={{ readOnly: true }}
             />
             <CopyToClipboard text={url}>
-                <IconButton onClick={copyToClipboard} component="span">
+                <IconButton component="span">
                     <FileCopyOutlinedIcon />
                 </IconButton>
             </CopyToClipboard>
