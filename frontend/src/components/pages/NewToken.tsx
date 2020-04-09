@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, memo } from 'react';
 import { Typography, IconButton } from '@material-ui/core';
 import { LoadingComponent } from '../common/LoadingComponent/LoadingComponent';
 import { createToken } from '../../api/api';
@@ -22,27 +22,20 @@ const linksNumberOptions = range(10, 1).map(i => ({ label: `${i}`, value: i }));
 
 const makeViewLink = (token: string) => document.location.origin + `/view/${encodeURI(token)}`;
 
-const TokenComponent = ({ url }: { url: string }) => {
+const TokenComponent = ({ url }: { url: string }) => (
+    <div style={{ display: 'flex' }}>
+        <TextField value={url}
+            style={{ width: '100%' }}
+            InputProps={{ readOnly: true }}
+        />
+        <CopyToClipboard text={url}>
+            <IconButton component="span">
+                <FileCopyOutlinedIcon />
+            </IconButton>
+        </CopyToClipboard>
+    </div>
+)
 
-    const copyToClipboard = async () => {
-        await navigator.clipboard.writeText(url);
-        // snackbar maybe
-    };
-
-    return (
-        <div style={{ display: 'flex' }}>
-            <TextField value={url}
-                style={{ width: '100%' }}
-                InputProps={{ readOnly: true }}
-            />
-            <CopyToClipboard text={url}>
-                <IconButton component="span">
-                    <FileCopyOutlinedIcon />
-                </IconButton>
-            </CopyToClipboard>
-        </div>
-    )
-}
 type Values = {
     ttl?: number;
     content: string;
@@ -104,7 +97,20 @@ const TokenForm = ({ setTokens, setLoading }: { setTokens: any, setLoading: any 
                 } />
         </>
     )
-}
+};
+
+const CopyAllLinks = memo(({ urls }: { urls: string[] }) => (
+    <div >
+        <Typography style={{display:'inline'}}>
+            Copy all
+        </Typography>
+        <CopyToClipboard text={urls.join("\n")}>
+            <IconButton component="span">
+                <FileCopyOutlinedIcon />
+            </IconButton>
+        </CopyToClipboard>
+    </div>
+));
 
 
 
@@ -123,9 +129,11 @@ const NewToken = () => {
                 <>
                     {urls.map(url => <TokenComponent url={url} />)}
                     <br />
+                    <CopyAllLinks urls={urls} />
+                    <br />
                     <Button onClick={() => setTokens([])}>
                         Share again
-                        </Button>
+                    </Button>
                 </>
                 :
                 <TokenForm setLoading={setLoading} setTokens={setTokens} />
