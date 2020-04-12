@@ -10,7 +10,3 @@ Does the same thing but can be used as a jsonApi too
 
 - Supports illimted lifetime secret
 
-
-## Todo
-
-- add option 'copy all links'
