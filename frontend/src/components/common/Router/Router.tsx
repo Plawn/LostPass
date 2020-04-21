@@ -10,7 +10,7 @@ const MyRouter = () => {
         <CenteredCard>
             <BrowserRouter>
                 <Switch>
-                    <Route path="/view/:token" component={ViewToken} />
+                    <Route path="/view/:token" component={ViewToken} params={{token: encodeURIComponent}} />
                     <Route path="/" component={NewToken} />
                 </Switch>
             </BrowserRouter>

@@ -6,7 +6,7 @@ import CopyToClipboard from '../../common/Button/CopyToClipboard';
 import OneToken from './oneToken';
 import TokenForm from './tokenForm';
 
-const makeViewLink = (token: string) => document.location.origin + `/view/${encodeURI(token)}`;
+const makeViewLink = (token: string) => document.location.origin + `/view/${encodeURIComponent(token)}`;
 
 
 

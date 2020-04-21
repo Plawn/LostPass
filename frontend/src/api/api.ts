@@ -17,13 +17,13 @@ export const createToken = async (content: string, ttl: number, linksNumber = 1)
 
 
 export const verifyToken = async (token: string) => {
-    const res = await fetch(`/api/preview/${encodeURI(token)}`)
+    const res = await fetch(`/api/preview/${encodeURIComponent(token)}`);
     const result: { valid: boolean } = await res.json();
     return result.valid;
 }
 
 export const retrieveContent = async (token: string) => {
-    const res = await fetch(`/api/view/${encodeURI(token)}`)
+    const res = await fetch(`/api/view/${encodeURIComponent(token)}`)
     const result: { content: string } = await res.json();
     return result.content;
 }

@@ -14,12 +14,15 @@ class RedisConf:
 class TokenHandler:
     TOKEN_SEPARATOR = '~'
 
-    def __init__(self, redis: RedisConf, crypto_engine: CyptoEngine):
+    def __init__(self, secret: str, redis: RedisConf, crypto_engine: CyptoEngine):
+        self.__secret = secret.encode('utf-8')
         self.__crypto_engine = crypto_engine
         self.__redis_conf = redis
-        self.locked_main_keys = {}
+        self.__locked_main_keys = {}
 
     def __parse_token(self, token: str) -> Tuple[str, bytes]:
+        token = self.__crypto_engine.decrypt(
+            token.encode('utf-8'), self.__secret).decode('utf-8')
         # Split once, not more.
         token_fragments: List[str] = token.split(self.TOKEN_SEPARATOR, 2)
         main_storage_key = token_fragments[0]
@@ -70,8 +73,14 @@ class TokenHandler:
                 self.__redis_conf.redis.set(
                     storage_key, second_layer_encryption_key)
 
+
+        # could be nicer
         return [
-            self.TOKEN_SEPARATOR.join((main_storage_key, storage_key, encryption_key.decode('utf-8'))) for storage_key, encryption_key in derived_keys
+            self.__crypto_engine.encrypt(self.TOKEN_SEPARATOR.join((
+                main_storage_key, storage_key, encryption_key.decode('utf-8'))
+            )
+                .encode('utf-8'), self.__secret)
+            .decode('utf-8') for storage_key, encryption_key in derived_keys
         ]
 
     def is_token_valid(self, token: str) -> bool:
@@ -102,12 +111,12 @@ class TokenHandler:
         try:
             # we need to count how many times a main key has been used
             # in order to delete it when fully used
-            if main_storage_key in self.locked_main_keys:
-                event = self.locked_main_keys[main_storage_key]
+            if main_storage_key in self.__locked_main_keys:
+                event = self.__locked_main_keys[main_storage_key]
                 event.wait()
                 event.clear()
             event = threading.Event()
-            self.locked_main_keys[main_storage_key] = event
+            self.__locked_main_keys[main_storage_key] = event
             # handling "see only once"
 
             self.__redis_conf.redis.delete(second_storage_key)
@@ -125,4 +134,4 @@ class TokenHandler:
             # if other people aquired this event
             event.set()
             # removing it
-            del self.locked_main_keys[main_storage_key]
+            del self.__locked_main_keys[main_storage_key]

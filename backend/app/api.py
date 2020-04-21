@@ -10,8 +10,10 @@ from .token_handler import TokenHandler
 
 app = Flask(__name__, static_folder='../../frontend/build')
 
+secret = 'test'
+
 engine = CyptoEngine()
-token_handler = TokenHandler(redis=redis_conf, crypto_engine=engine)
+token_handler = TokenHandler(secret, redis=redis_conf, crypto_engine=engine)
 
 MAX_MULTI_LINK = 15
 
