@@ -1,7 +1,7 @@
 import React from 'react';
 import { Route, Switch, BrowserRouter } from 'react-router-dom';
-import NewToken from '../../pages/NewToken';
-import ViewToken from '../../pages/ViewToken';
+import NewToken from '../../pages/NewToken/NewToken';
+import ViewToken from '../../pages/ViewToken/ViewToken';
 import CenteredCard from '../PageContainer/CenteredCard';
 
 
