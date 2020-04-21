@@ -2,3 +2,4 @@ flask
 gevent
 cryptography
 redis
+pyyaml

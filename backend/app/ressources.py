@@ -1,19 +1,26 @@
 import os
-import redis
 import uuid
+
+import redis
+import yaml
 from redis.exceptions import ConnectionError
-from .token_handler import RedisConf 
+
+from .data_objects import Conf
+from .token_handler import RedisConf
+from .utils import dataclass_from_dict
+
+conf_filename = os.environ.get('CONF_FILE', 'conf.yaml')
 
 
-if os.environ.get('REDIS_URL'):
-    redis_client = redis.StrictRedis.from_url(os.environ.get('REDIS_URL'))
-else:
-    redis_host = os.environ.get('REDIS_HOST', 'localhost')
-    redis_port = os.environ.get('REDIS_PORT', 6379)
-    redis_db = os.environ.get('SNAPPASS_REDIS_DB', 0)
-    redis_client = redis.StrictRedis(
-        host=redis_host, port=redis_port, db=redis_db)
+def get_conf() -> Conf:
+    with open(conf_filename, 'r') as f:
+        conf = dataclass_from_dict(Conf, yaml.safe_load(f))
+    return conf
 
-REDIS_PREFIX = os.environ.get('REDIS_PREFIX', 'snappass')
 
-redis_conf = RedisConf(redis_client, REDIS_PREFIX)
+conf = get_conf()
+
+redis_client = redis.StrictRedis(
+    host=conf.redis.host, port=conf.redis.port, db=conf.redis.db)
+
+redis_conf = RedisConf(redis_client)

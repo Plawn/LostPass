@@ -1,0 +1,9 @@
+
+# refis conf
+redis:
+  host: localhost
+  port: 6379
+  db: 0
+
+# this way flask will serve the front end
+self_served: true

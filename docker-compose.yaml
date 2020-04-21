@@ -7,7 +7,7 @@ services:
       image: plawnpass
       ports:
         - "5000:4000"
-      environment:
-        - REDIS_HOST=redis
+      volumes: 
+        - './conf.yaml:/api/conf.yaml'
       depends_on:
         - redis
