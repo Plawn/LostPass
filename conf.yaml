@@ -5,5 +5,12 @@ redis:
   port: 6379
   db: 0
 
+
+crypto:
+  secret: test
+  mode: AES_GCM
+# crypto_mode: FERNET
+
+flask:
 # this way flask will serve the front end
-self_served: true
+  serve_front: true

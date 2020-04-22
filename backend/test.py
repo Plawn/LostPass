@@ -1,5 +1,5 @@
 import requests
-from urllib.parse import quote
+from urllib.parse import quote_plus
 import random
 import string
 
@@ -28,13 +28,16 @@ def create_token(content: str) -> str:
 
 
 def preview_token(token: str) -> bool:
-    r = requests.get(url+'/api/preview/' + quote(token))
+    quoted_token = quote_plus(token.encode('utf-8'))
+    print('token', token)
+    print('quoted token', quoted_token)
+    r = requests.get(url+'/api/preview/' + quoted_token)
     if r.status_code < 300:
         return r.json()['valid']
 
 
 def view_token(token: str) -> str:
-    r = requests.get(url+'/api/view/' + quote(token))
+    r = requests.get(url+'/api/view/' + quote_from_bytes(token))
     if r.status_code < 300:
         return r.json()['content']
     

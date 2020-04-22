@@ -5,9 +5,8 @@ import redis
 import yaml
 from redis.exceptions import ConnectionError
 
-from .data_objects import Conf
+from .conf_handler import Conf, dataclass_from_dict
 from .token_handler import RedisConf
-from .utils import dataclass_from_dict
 
 conf_filename = os.environ.get('CONF_FILE', 'conf.yaml')
 

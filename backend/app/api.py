@@ -4,20 +4,21 @@ import os
 from flask import Flask, jsonify, request, send_from_directory
 from werkzeug.urls import url_unquote_plus
 
-from .crypto_engine import CyptoEngine
+from .crypto_engines import crypto_engines
 from .ressources import redis_conf, conf
-from .token_handler import TokenHandler
+from .token_handler import TokenHandler, InvalidToken
 
 app = Flask(__name__, static_folder='../../frontend/build')
 
 secret = 'test'
 
-engine = CyptoEngine()
+# getting an engine
+engine = (crypto_engines[conf.crypto.mode].value)()
 token_handler = TokenHandler(secret, redis=redis_conf, crypto_engine=engine)
 
 MAX_MULTI_LINK = 15
 
-SELF_SERVED = conf.self_served
+SELF_SERVED = conf.flask.serve_front
 
 
 if SELF_SERVED:
@@ -51,8 +52,12 @@ def create_token():
         return make_error(f'Too many links requested | max is {MAX_MULTI_LINK}')
     if content is None or ttl == -1:
         return make_error('missiong field')
+    tokens, used, _for = token_handler.set_string(
+        content, ttl, nb_token=multi_links, expires=ttl != 0)
     return jsonify({
-        'tokens': token_handler.set_string(content, ttl, nb_token=multi_links, expires=ttl != 0)
+        'tokens': tokens,
+        'used': used,
+        'for': _for
     })
 
 
@@ -60,13 +65,19 @@ def create_token():
 def preview(token: str):
     """just check if the token is valid here
     """
-    return jsonify({
-        'valid': token_handler.is_token_valid(url_unquote_plus(token))
-    })
+    try:
+        return jsonify({
+            'valid': token_handler.is_token_valid(url_unquote_plus(token))
+        })
+    except InvalidToken:
+        return make_error('Invalid token')
 
 
 @app.route('/api/view/<token>', methods=['GET'])
 def view_password(token: str):
-    return jsonify({
-        'content': token_handler.get_string(url_unquote_plus(token))
-    })
+    try:
+        return jsonify({
+            'content': token_handler.get_string(url_unquote_plus(token))
+        })
+    except InvalidToken:
+        return make_error('Invalid token')

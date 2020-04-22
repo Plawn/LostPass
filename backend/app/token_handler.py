@@ -3,7 +3,7 @@ from typing import *
 from redis import StrictRedis
 import uuid
 from dataclasses import dataclass
-from .crypto_engine import CyptoEngine
+from .crypto_engines import CryptoEngine
 
 
 @dataclass
@@ -11,23 +11,29 @@ class RedisConf:
     redis: StrictRedis
 
 
+class InvalidToken(Exception):
+    pass
+
 class TokenHandler:
     TOKEN_SEPARATOR = '~'
 
-    def __init__(self, secret: str, redis: RedisConf, crypto_engine: CyptoEngine):
-        self.__secret = secret.encode('utf-8')
+    def __init__(self, secret: str, redis: RedisConf, crypto_engine: CryptoEngine):
         self.__crypto_engine = crypto_engine
         self.__redis_conf = redis
         self.__locked_main_keys = {}
+        self.__secret = self.__crypto_engine.prepare_encryption_key(secret)
 
     def __parse_token(self, token: str) -> Tuple[str, bytes]:
-        token = self.__crypto_engine.decrypt(
+        try:
+            token = self.__crypto_engine.decrypt(
             token.encode('utf-8'), self.__secret).decode('utf-8')
-        # Split once, not more.
-        token_fragments: List[str] = token.split(self.TOKEN_SEPARATOR, 2)
-        main_storage_key = token_fragments[0]
-        second_storage_key = token_fragments[1]
-        decryption_key = token_fragments[2].encode('utf-8')
+            # Split once, not more.
+            token_fragments: List[str] = token.split(self.TOKEN_SEPARATOR, 2)
+            main_storage_key = token_fragments[0]
+            second_storage_key = token_fragments[1]
+            decryption_key = token_fragments[2].encode('utf-8')
+        except:
+            raise InvalidToken
         return main_storage_key, second_storage_key, decryption_key
 
     def __make_redis_storage_key(self) -> str:
@@ -43,6 +49,7 @@ class TokenHandler:
         """
         Sets the content in the redis and returns a token to access it
         """
+        stored = 0
         encryption_key = self.__crypto_engine.make_key()
 
         # for tests
@@ -50,6 +57,7 @@ class TokenHandler:
         encrypted_data = self.__crypto_engine.encrypt(
             content, encryption_key)
         main_storage_key = self.__make_redis_storage_key()
+        stored += len(encrypted_data)
         if expires:
             self.__redis_conf.redis.setex(
                 main_storage_key, ttl, encrypted_data)
@@ -62,7 +70,7 @@ class TokenHandler:
         derived_keys = [
             (self.__make_redis_storage_key(), self.__crypto_engine.make_key()) for _ in range(nb_tokens)
         ]
-
+        stored += len(encrypted_data) * len(derived_keys)
         for storage_key, key in derived_keys:
             second_layer_encryption_key = self.__crypto_engine.encrypt(
                 encryption_key, key)
@@ -73,7 +81,7 @@ class TokenHandler:
                 self.__redis_conf.redis.set(
                     storage_key, second_layer_encryption_key)
 
-
+        print(f'used {stored} bytes to store {len(content)}')
         # could be nicer
         return [
             self.__crypto_engine.encrypt(self.TOKEN_SEPARATOR.join((
@@ -81,7 +89,7 @@ class TokenHandler:
             )
                 .encode('utf-8'), self.__secret)
             .decode('utf-8') for storage_key, encryption_key in derived_keys
-        ]
+        ], stored, len(content)
 
     def is_token_valid(self, token: str) -> bool:
         """checks if a given token is still valid
