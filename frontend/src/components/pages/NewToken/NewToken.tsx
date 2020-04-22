@@ -34,7 +34,7 @@ const NewToken = () => {
         <LoadingComponent loading={loading}>
             {tokens.length > 0 ?
                 <>
-                    {urls.map(url => <OneToken url={url} />)}
+                    {urls.map(url => <OneToken key={url} url={url} />)}
                     <br />
                     <CopyAllLinks urls={urls} />
                     <br />

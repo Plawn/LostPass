@@ -8,8 +8,8 @@ redis:
 
 crypto:
   secret: test
-  mode: AES_GCM
-# crypto_mode: FERNET
+  # mode: AES_GCM
+  mode: FERNET
 
 flask:
 # this way flask will serve the front end

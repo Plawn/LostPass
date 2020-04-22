@@ -14,6 +14,7 @@ class RedisConf:
 class InvalidToken(Exception):
     pass
 
+
 class TokenHandler:
     TOKEN_SEPARATOR = '~'
 
@@ -24,9 +25,10 @@ class TokenHandler:
         self.__secret = self.__crypto_engine.prepare_encryption_key(secret)
 
     def __parse_token(self, token: str) -> Tuple[str, bytes]:
+        # determine if two layers and parse accordingly
         try:
             token = self.__crypto_engine.decrypt(
-            token.encode('utf-8'), self.__secret).decode('utf-8')
+                token.encode('utf-8'), self.__secret).decode('utf-8')
             # Split once, not more.
             token_fragments: List[str] = token.split(self.TOKEN_SEPARATOR, 2)
             main_storage_key = token_fragments[0]
@@ -49,15 +51,15 @@ class TokenHandler:
         """
         Sets the content in the redis and returns a token to access it
         """
+        # use the given method -> 1 layer or 2 layers
         stored = 0
         encryption_key = self.__crypto_engine.make_key()
 
-        # for tests
-        # encryption_key = 'test'
         encrypted_data = self.__crypto_engine.encrypt(
             content, encryption_key)
         main_storage_key = self.__make_redis_storage_key()
         stored += len(encrypted_data)
+        print(f'main content is {len(encrypted_data)}')
         if expires:
             self.__redis_conf.redis.setex(
                 main_storage_key, ttl, encrypted_data)
@@ -70,7 +72,9 @@ class TokenHandler:
         derived_keys = [
             (self.__make_redis_storage_key(), self.__crypto_engine.make_key()) for _ in range(nb_tokens)
         ]
-        stored += len(encrypted_data) * len(derived_keys)
+        derived_key_size = len(derived_keys[0][1]) * len(derived_keys)
+        print(f'derived is {derived_key_size} | {len(derived_keys[0][1])}')
+        stored += derived_key_size
         for storage_key, key in derived_keys:
             second_layer_encryption_key = self.__crypto_engine.encrypt(
                 encryption_key, key)
@@ -95,7 +99,7 @@ class TokenHandler:
         """checks if a given token is still valid
         """
         main_storage_key, second_storage_key, _ = self.__parse_token(token)
-        return self.__redis_conf.redis.exists(second_storage_key) and self.__redis_conf.redis.exists(main_storage_key)
+        return self.__redis_conf.redis.exists(second_storage_key)
 
     def get_string(self, token: str) -> str:
         """Fetch the data for a given valid token from the redis

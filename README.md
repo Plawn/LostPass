@@ -18,4 +18,5 @@ Does the same thing but can be used as a jsonApi too
 
 - Add file share 
 - Add support for AES_CTR
+- Add support for AES_CBC
 - Fix tests

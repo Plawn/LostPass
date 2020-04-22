@@ -1,5 +1,5 @@
 import requests
-from urllib.parse import quote_plus
+from urllib.parse import quote_plus, quote, quote_from_bytes
 import random
 import string
 
@@ -14,24 +14,29 @@ def random_string(string_length=10):
     return ''.join(random.choice(letters) for i in range(string_length))
 
 
-def create_token(content: str) -> str:
+def create_token(content: str, links_number=1, bench=False) -> str:
 
     data = {
         'content': content,
-        'ttl': base_ttl
+        'ttl': base_ttl,
+        'links_number':links_number
     }
 
     r = requests.post(url + '/api/new', json=data)
 
+    
     if r.status_code < 300:
-        return r.json()['tokens'][0]
-
+        if not bench:
+            return r.json()['tokens'][0]
+        else:
+            return r.json()['used']
 
 def preview_token(token: str) -> bool:
-    quoted_token = quote_plus(token.encode('utf-8'))
+    quoted_token = quote_plus(token)
     print('token', token)
     print('quoted token', quoted_token)
     r = requests.get(url+'/api/preview/' + quoted_token)
+    print(r.text)
     if r.status_code < 300:
         return r.json()['valid']
 
@@ -42,7 +47,7 @@ def view_token(token: str) -> str:
         return r.json()['content']
     
 
-if __name__ == '__main__':
+def full_test():
     content = random_string(base_string_length)
     token = create_token(content)
     print(f'token is {token}')
@@ -60,3 +65,23 @@ if __name__ == '__main__':
     else:
         print("token should be valid but isn't")
         print('TEST -- FAILED')
+
+
+def bench():
+    for l in range(1, 11):
+        result = []
+        for i in range(100):
+            print(i)
+            result.append(create_token('c'*i, l,bench=True))
+        import matplotlib.pyplot as plt
+        import json
+        with open('res.json', 'w') as f :
+            json.dump(result, f)
+        plt.figure()
+        plt.plot(range(100), result)
+        plt.show()
+    
+
+if __name__ == '__main__':
+    # full_test()
+    bench()

@@ -18,19 +18,14 @@ token_handler = TokenHandler(secret, redis=redis_conf, crypto_engine=engine)
 
 MAX_MULTI_LINK = 15
 
-SELF_SERVED = conf.flask.serve_front
-
-
-if SELF_SERVED:
-    logging.info(
-        'Flask is serving the frontend -> not the most performant way to do it !')
-
 
 def make_error(msg: str, code=400):
     return jsonify({'error': msg}), code
 
 
-if SELF_SERVED:
+if conf.flask.serve_front:
+    logging.warning(
+        'Flask is serving the frontend -> not the most performant way to do it !')
     # serving the front end react app
     @app.route('/', defaults={'path': ''})
     @app.route('/<path:path>')

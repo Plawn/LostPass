@@ -22,13 +22,15 @@ const ViewToken = (props: Props) => {
         setLoading(true);
         verifyToken(token)
             .then(isValid => setValid(isValid))
-            .catch(() => { })
+            .catch(() => setValid(false))
             .finally(() => setLoading(false));
     }, [token]);
 
     useEffect(() => {
         loadData();
     }, [loadData]);
+
+    console.log(valid);
 
     return (
         <LoadingComponent loading={loading || valid === undefined}>
