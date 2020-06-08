@@ -1,12 +1,24 @@
-# LostSecret
+# LostPass
+
+### How to run it ?
+
+Without docker 
+
+Run a redis, with the default user and use the configuration file to setup it with the application
+
+use the start_standalone.sh script to start the app
+
+With docker
+
+Run a redis, in a container
+
+use the configuration file to setup it with the application and don't forget to mount it, in the container
+
+use the Dockerfile to build the image and simply run it
+
+### Infos 
 
 requires python3.7
-
-Based on https://github.com/pinterest/snappass
-
-
-
-Does the same thing but can be used as a jsonApi too
 
 - Supports illimted lifetime secret
 
