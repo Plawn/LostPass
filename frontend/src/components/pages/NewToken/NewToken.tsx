@@ -9,9 +9,8 @@ import TokenForm from './tokenForm';
 const makeViewLink = (token: string) => document.location.origin + `/view/${encodeURIComponent(token)}`;
 
 
-
 const CopyAllLinks = memo(({ urls }: { urls: string[] }) => (
-    <div >
+    <div>
         <Typography style={{ display: 'inline' }}>
             Copy all
         </Typography>
@@ -22,19 +21,24 @@ const CopyAllLinks = memo(({ urls }: { urls: string[] }) => (
 
 
 const NewToken = () => {
-
-
     const [tokens, setTokens] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
 
     // doing so to add all copy on one click after
     const urls = useMemo(() => tokens.map(makeViewLink), [tokens]);
 
+    // avoiding re-renders
+    const AllUrls = useMemo(() => (
+        <>
+            {urls.map(url => <OneToken key={url} url={url} />)}
+        </>
+    ), [urls]);
+
     return (
         <LoadingComponent loading={loading}>
             {tokens.length > 0 ?
                 <>
-                    {urls.map(url => <OneToken key={url} url={url} />)}
+                    {AllUrls}
                     <br />
                     <CopyAllLinks urls={urls} />
                     <br />

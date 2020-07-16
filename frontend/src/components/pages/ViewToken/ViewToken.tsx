@@ -9,7 +9,7 @@ type RouteParams = {
     token: string;
 }
 
-type Props = RouteComponentProps<RouteParams>
+type Props = RouteComponentProps<RouteParams>;
 
 const TokenViewer = ({ valid, token }: { valid?: boolean; token: string }) => (valid ? <ValidToken token={token} /> : <InvalidToken />)
 
@@ -30,13 +30,11 @@ const ViewToken = (props: Props) => {
         loadData();
     }, [loadData]);
 
-    console.log(valid);
-
     return (
         <LoadingComponent loading={loading || valid === undefined}>
             <TokenViewer valid={valid} token={token} />
         </LoadingComponent>
-    )
+    );
 }
 
 export default ViewToken;

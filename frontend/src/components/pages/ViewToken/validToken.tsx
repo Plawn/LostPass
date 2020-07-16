@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, memo } from 'react';
 import { LoadingComponent } from '../../common/LoadingComponent/LoadingComponent';
 import Bold from '../../common/Text/Bold';
 import { Button, Typography } from '@material-ui/core';
@@ -6,14 +6,14 @@ import MultiLineTextField from '../../common/form/MultiLineTextField/MultiLineTe
 import { retrieveContent } from '../../../api/api';
 import CheckCircleOutlinedIcon from '@material-ui/icons/CheckCircleOutlined';
 
-const ValidToken = ({ token }: { token: string }) => {
+const ValidToken = memo(({ token }: { token: string }) => {
     const [content, setContent] = useState<string | undefined>(undefined);
     const [loading, setLoading] = useState(false);
 
     const handleGetContent = () => {
         setLoading(true);
         retrieveContent(token)
-            .then(content => setContent(content))
+            .then(setContent)
             .catch(() => setContent('Failed to fetch content'))
             .finally(() => setLoading(false));
     }
@@ -48,6 +48,6 @@ const ValidToken = ({ token }: { token: string }) => {
             }
         </LoadingComponent>
     )
-};
+});
 
 export default ValidToken;

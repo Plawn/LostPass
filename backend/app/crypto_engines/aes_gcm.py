@@ -20,6 +20,13 @@ class CyptoEngine:
         return password.encode('utf-8')
 
     def encrypt(self, plain: bytes, password: bytes) -> bytes:
+        """
+        return a dictionary with the encrypted text
+        salt : length 16
+        nonce : length 16
+        tag : length 16
+        cipher_text : lentgh any
+        """
         # generate a random salt
         salt = get_random_bytes(AES.block_size)
 

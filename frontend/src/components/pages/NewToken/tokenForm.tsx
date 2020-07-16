@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { createToken } from '../../../api/api';
 import SelectField from '../../common/form/SelectField/SelectField';
 import { Form, Field, Formik } from 'formik';
@@ -7,12 +7,14 @@ import { range } from '../../../utils/utils';
 import { Typography } from '@material-ui/core';
 import Button from '../../common/Button/Button';
 
+type setState<T> = Dispatch<SetStateAction<T>>;
+
 const durationOptions = [
     { label: 'Hour', value: 3600 },
     { label: 'Day', value: 3600 * 24 },
     { label: 'Week', value: 3600 * 24 * 7 },
     { label: 'Never', value: 0 },
-]
+];
 
 const linksNumberOptions = range(10, 1).map(i => ({ label: `${i}`, value: i }));
 
@@ -28,18 +30,14 @@ const initialValues: Values = {
     linksNumber: 1,
 };
 
-export default ({ setTokens, setLoading }: { setTokens: any, setLoading: any }) => {
+export default ({ setTokens, setLoading }: { setTokens: setState<string[]>, setLoading: setState<boolean> }) => {
 
     const handleTokenCreation = async (content: string, ttl: number, linksNumber: number) => {
         setTokens([]);
         setLoading(true);
-        try {
-            const tokens = await createToken(content, ttl, linksNumber);
-            setTokens(tokens);
-        } catch (e) {
-
-        }
-        setLoading(false);
+        createToken(content, ttl, linksNumber)
+            .then(setTokens)
+            .finally(() => setLoading(false));
     };
 
     return (

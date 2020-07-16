@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { memo } from 'react';
 import TextField from '../../common/form/TextField/TextField';
 import CopyToClipboard from '../../common/Button/CopyToClipboard';
 
-export default ({ url }: { url: string }) => (
+export default memo(({ url }: { url: string }) => (
     <div style={{ display: 'flex' }}>
         <TextField value={url}
             style={{ width: '100%' }}
@@ -10,4 +10,4 @@ export default ({ url }: { url: string }) => (
         />
         <CopyToClipboard string={url} />
     </div>
-)
+));

@@ -1,29 +1,29 @@
 
+type Method = 'GET' | 'PUT' | 'POST' | 'DELETE'
 
-export const createToken = async (content: string, ttl: number, linksNumber = 1) => {
+async function api<T>(url: string, method: Method, body: any = null) {
     const headers = new Headers();
     headers.append("Content-Type", "application/json");
     headers.append("Accept", "application/json");
-    const res = await fetch('/api/new',
+    const res = await fetch(`/api${url}`,
         {
-            method: 'POST',
+            method: method,
             headers,
-            body: JSON.stringify({ content, ttl, links_number: linksNumber })
+            body: body ? JSON.stringify(body) : null
         }
     );
-    const result: { tokens: string[] } = await res.json();
-    return result.tokens;
-};
-
-
-export const verifyToken = async (token: string) => {
-    const res = await fetch(`/api/preview/${encodeURIComponent(token)}`);
-    const result: { valid: boolean } = await res.json();
-    return result.valid;
+    if (!res.ok) {
+        throw res;
+    }
+    return res.json() as Promise<T>;
 }
 
-export const retrieveContent = async (token: string) => {
-    const res = await fetch(`/api/view/${encodeURIComponent(token)}`)
-    const result: { content: string } = await res.json();
-    return result.content;
-}
+async function get<T>(url: string) { return api<T>(url, 'GET'); }
+
+async function post<T>(url: string, body?: any) { return api<T>(url, 'POST', body); }
+
+export const createToken = async (content: string, ttl: number, linksNumber = 1) => (await post<{ tokens: string[] }>('/new', { content, ttl, links_number: linksNumber })).tokens;
+
+export const verifyToken = async (token: string) => (await get<{ valid: boolean }>(`/preview/${encodeURIComponent(token)}`)).valid;
+
+export const retrieveContent = async (token: string) => (await get<{ content: string }>(`/view/${encodeURIComponent(token)}`)).content;
