@@ -1,10 +1,10 @@
-import React, { ReactNode } from 'react';
+import React, { CSSProperties, ReactNode } from 'react';
 import { Grid, Paper } from '@material-ui/core';
-import { CSSProperties } from '@material-ui/core/styles/withStyles';
+
 
 type Props = {
     children: ReactNode;
-    style?: CSSProperties
+    style?: CSSProperties;
 }
 
 const CenteredCard: React.FC<Props> = ({ children, style }: Props) => (
