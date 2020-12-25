@@ -1,6 +1,20 @@
-flask
-gevent
+# http server
+# maybe less than all for later
+fastapi
+uvicorn
+# schema validation
+pydantic
+# static file serve
+aiofiles
+# crypto
 cryptography
-redis
-pyyaml
 pycryptodomex
+
+# fast and erasable storage
+redis
+
+# conf loading
+pyyaml
+
+# working with urls
+werkzeug

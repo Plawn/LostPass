@@ -1,1 +1,1 @@
-python3 start.py 5000
+uvicorn app.api:app --reload --port 5000

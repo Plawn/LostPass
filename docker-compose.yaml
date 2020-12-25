@@ -1,13 +1,21 @@
 version: '3'
 services: 
     redis:
+      # should setup env here
       image: "redis:latest"
-    plawnpass:
-      build: .
-      image: plawnpass
-      ports:
-        - "5000:4000"
+    back:
+      build: ./backend
+      image: plawnpass-back
+      expose:
+        - 5000
       volumes: 
         - './conf.yaml:/api/conf.yaml'
       depends_on:
         - redis
+    front:
+      build: ./frontend
+      image: plawnpass-front
+      ports:
+        - '5000:80'
+      depends_on:
+        - back

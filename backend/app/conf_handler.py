@@ -1,35 +1,28 @@
 from dataclasses import dataclass, fields
-from .crypto_engines import crypto_engines
+from typing import List, Optional
+
+from pydantic import BaseModel
+
+from .crypto_engines import CryptoEngines
 
 
-def dataclass_from_dict(klass, d):
-    try:
-        fieldtypes = {f.name: f.type for f in fields(klass)}
-        return klass(**{f: dataclass_from_dict(fieldtypes[f], d[f]) for f in d})
-    except:
-        return d  # Not a dataclass field
-
-
-@dataclass
-class RedisConfig:
+class RedisConfig(BaseModel):
     host: str
     port: int
     db: int
 
 
-@dataclass
-class CryptoConfig:
-    mode: crypto_engines
+class CryptoConfig(BaseModel):
+    mode: CryptoEngines
     secret: str
 
 
-@dataclass
-class FlaskConfig:
+class FlaskConfig(BaseModel):
     serve_front: bool
+    cors: Optional[List[str]]
 
 
-@dataclass
-class Conf:
+class Conf(BaseModel):
     redis: RedisConfig
     flask: FlaskConfig
     crypto: CryptoConfig

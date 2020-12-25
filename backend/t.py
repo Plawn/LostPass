@@ -48,7 +48,7 @@ def main():
     password = input("Password: ")
 
     # First let us encrypt secret message
-    encrypted = encrypt("The secretest mesfffsage here"*10, password)
+    encrypted = encrypt("The secretest messsage here"*10, password)
     print(encrypted)
 
     # Let us decrypt using our original password
