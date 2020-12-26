@@ -1,7 +1,6 @@
-from dataclasses import dataclass, fields
 from typing import List, Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, BaseSettings
 
 from .crypto_engines import CryptoEngines
 
@@ -26,3 +25,12 @@ class Conf(BaseModel):
     redis: RedisConfig
     flask: FlaskConfig
     crypto: CryptoConfig
+
+class Settings(BaseSettings):
+    conf_filename: str = 'conf.yaml'
+    debug: bool = False
+
+    class Config:
+        fields = {
+            'conf_filename': 'CONF_FILE'
+        }

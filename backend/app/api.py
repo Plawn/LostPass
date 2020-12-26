@@ -47,7 +47,7 @@ def make_error(msg: str, code: int = 400):
 
 @app.post('/api/new')
 def create_token(body: NewTokenDTO):
-    tokens, used, _for = token_handler.set_string(
+    tokens, used = token_handler.set_string(
         body.content, body.ttl,
         nb_token=body.links_number,
         expires=body.ttl != 0
@@ -55,7 +55,6 @@ def create_token(body: NewTokenDTO):
     return {
         'tokens': tokens,
         'used': used,
-        'for': _for
     }
 
 

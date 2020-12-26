@@ -14,8 +14,8 @@ class InvalidToken(Exception):
 REMAINING_SUFFIX = '_r'
 TOKEN_SEPARATOR = '~'
 
+
 class TokenHandler:
-    
 
     def __init__(
         self,
@@ -23,7 +23,8 @@ class TokenHandler:
         redis: StrictRedis,
         crypto_engine: CryptoEngine,
         *,
-        logger: Optional[logging.Logger] = None
+        logger: Optional[logging.Logger] = None,
+        debug: bool = False
     ):
         self.__crypto_engine = crypto_engine
         self.__redis_conf = redis
@@ -32,6 +33,7 @@ class TokenHandler:
         # put lock inside redis for better scaling ?
         self.__locked_main_keys = {}
         self.__secret = self.__crypto_engine.prepare_encryption_key(secret)
+        self.__debug = debug
 
     def __parse_token(self, token: str) -> Tuple[str, bytes]:
         # determine if two layers and parse accordingly
@@ -61,13 +63,13 @@ class TokenHandler:
     def __make_redis_storage_key(self) -> str:
         return uuid.uuid4().hex
 
-    def set_string(self, content: str, ttl: int = 1, nb_token: int = 1, expires: bool = True) -> str:
+    def set_string(self, content: str, ttl: int = 1, nb_token: int = 1, expires: bool = True) -> Tuple[List[str], int]:
         """
         Sets the content in the redis and returns a token to access it
         """
         return self.set_bytes(content.encode('utf-8'), ttl, nb_tokens=nb_token, expires=expires)
 
-    def set_bytes(self, content: bytes, ttl: int = 1, nb_tokens: int = 1, expires: bool = True) -> str:
+    def set_bytes(self, content: bytes, ttl: int = 1, nb_tokens: int = 1, expires: bool = True) -> Tuple[List[str], int]:
         """
         Sets the content in the redis and returns a token to access it
         """
@@ -112,7 +114,7 @@ class TokenHandler:
             )
                 .encode('utf-8'), self.__secret)
             .decode('utf-8') for storage_key, encryption_key in derived_keys
-        ], stored, len(content)
+        ], stored if self.__debug else 0
 
     def is_token_valid(self, token: str) -> bool:
         """checks if a given token is still valid
