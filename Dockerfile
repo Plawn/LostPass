@@ -1,9 +1,9 @@
 # build environment
-FROM node:alpine as builder
+FROM node:14.15.3-alpine3.10 as builder
 
 WORKDIR /app
 
-COPY frontend/package.json .
+COPY frontend/package.json frontend/yarn.lock ./
 
 RUN yarn install --ignore-optional --frozen-lockfile 
 
@@ -11,12 +11,14 @@ COPY ./frontend/ .
 RUN yarn build
 
 # production environment
-FROM python:3.7.2-slim
+FROM python:3.8.6-slim
 
 WORKDIR /api
 
 RUN apt update \
-    && apt install nginx -y 
+    && apt install nginx redis -y 
+
+RUN pip install gunicorn uvloop httptools
 
 COPY --from=builder app/build/ /usr/share/nginx/html/
 COPY default.conf /etc/nginx/conf.d/default.conf

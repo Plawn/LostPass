@@ -1,4 +1,7 @@
+.vscode
 *.DS_Store
 *__pycache__
-*/node_modules
-*/build
+**/node_modules/
+**/build/
+*Dockerfile
+.git

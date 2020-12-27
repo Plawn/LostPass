@@ -2,6 +2,7 @@
 # maybe less than all for later
 fastapi
 uvicorn
+
 # schema validation
 pydantic
 # static file serve
