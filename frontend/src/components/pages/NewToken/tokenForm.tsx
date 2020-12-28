@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, memo, SetStateAction } from 'react';
 import { createToken } from '../../../api/api';
 import SelectField from '../../common/form/SelectField/SelectField';
 import { Form, Field, Formik } from 'formik';
@@ -30,7 +30,12 @@ const initialValues: Values = {
     linksNumber: 1,
 };
 
-export default ({ setTokens, setLoading }: { setTokens: setState<string[]>, setLoading: setState<boolean> }) => {
+type Props = {
+    setTokens: setState<string[]>;
+    setLoading: setState<boolean>;
+};
+
+const TokenForm = memo(({ setTokens, setLoading }: Props) => {
 
     const handleTokenCreation = async (content: string, ttl: number, linksNumber: number) => {
         setTokens([]);
@@ -48,9 +53,12 @@ export default ({ setTokens, setLoading }: { setTokens: setState<string[]>, setL
             <Formik
                 initialValues={initialValues}
                 onSubmit={async values => {
-                    values.ttl !== undefined && handleTokenCreation(values.content, +values.ttl, +values.linksNumber);
+                    if (values.ttl !== undefined) {
+                        handleTokenCreation(values.content, +values.ttl, +values.linksNumber);
+                    }
                 }}
-                render={() =>
+            >
+                {() =>
                     <Form>
                         <Field label="Content" name="content" placeholder="Enter your content here" component={FormikMultiLineTextField} />
                         <div>
@@ -72,7 +80,9 @@ export default ({ setTokens, setLoading }: { setTokens: setState<string[]>, setL
                             Share Secret
                         </Button>
                     </Form>
-                } />
+                }</Formik>
         </>
     )
-};
+});
+
+export default TokenForm;

@@ -18,11 +18,17 @@ async function api<T>(url: string, method: Method, body: any = null) {
     return res.json() as Promise<T>;
 }
 
-async function get<T>(url: string) { return api<T>(url, 'GET'); }
+async function get<T>(url: string) {
+    return api<T>(url, 'GET');
+}
 
-async function post<T>(url: string, body?: any) { return api<T>(url, 'POST', body); }
+async function post<T>(url: string, body?: any) {
+    return api<T>(url, 'POST', body);
+}
 
-export const createToken = async (content: string, ttl: number, linksNumber = 1) => (await post<{ tokens: string[] }>('/new', { content, ttl, links_number: linksNumber })).tokens;
+export const createToken = async (content: string, ttl: number, linksNumber = 1) => (
+    await post<{ tokens: string[] }>('/new', { content, ttl, links_number: linksNumber })
+).tokens;
 
 export const verifyToken = async (token: string) => (await get<{ valid: boolean }>(`/preview/${encodeURIComponent(token)}`)).valid;
 

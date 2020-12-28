@@ -1,12 +1,14 @@
-import React from 'react';
-import CopyToClipboard from 'react-copy-to-clipboard';
+import React, { memo } from 'react';
+import BaseCopyToClipboard from 'react-copy-to-clipboard';
 import { IconButton } from '@material-ui/core';
 import FileCopyOutlinedIcon from '@material-ui/icons/FileCopyOutlined';
 
-export default ({ string }: { string: string }) => (
-    <CopyToClipboard text={string}>
+const CopyToClipboard = memo(({ string }: { string: string }) => (
+    <BaseCopyToClipboard text={string}>
         <IconButton component="span">
             <FileCopyOutlinedIcon />
         </IconButton>
-    </CopyToClipboard>
-);
+    </BaseCopyToClipboard>
+));
+
+export default CopyToClipboard;

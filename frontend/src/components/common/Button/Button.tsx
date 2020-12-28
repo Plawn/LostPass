@@ -1,5 +1,5 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Button, ButtonProps } from '@material-ui/core';
 
 
-export default (props: ButtonProps) => <Button {...props} variant="outlined" />
+export default memo((props: ButtonProps) => <Button {...props} variant="outlined" />);
