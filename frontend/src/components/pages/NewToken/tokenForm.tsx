@@ -4,8 +4,7 @@ import SelectField from '../../common/form/SelectField/SelectField';
 import { Form, Field, Formik } from 'formik';
 import { FormikTextField, FormikMultiLineTextField } from '../../common/form/FormikTextField/FormikTextField';
 import { range } from '../../../utils/utils';
-import { Typography } from '@material-ui/core';
-import Button from '../../common/Button/Button';
+import { Button, Typography } from '@material-ui/core';
 
 type setState<T> = Dispatch<SetStateAction<T>>;
 
@@ -76,7 +75,7 @@ const TokenForm = memo(({ setTokens, setLoading }: Props) => {
                             <Field name="linksNumber" options={linksNumberOptions} label="Number of links" component={SelectField} />
                         </div>
                         <br />
-                        <Button type="submit">
+                        <Button color="primary" variant="contained" type="submit">
                             Share Secret
                         </Button>
                     </Form>

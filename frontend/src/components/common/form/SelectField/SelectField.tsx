@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 		width: 200,
 	},
 	inputLabel: {
-		color: theme.palette.primary.main,
+		// color: theme.palette.primary.main,
 	},
 }));
 
