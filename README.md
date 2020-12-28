@@ -18,7 +18,7 @@ use the Dockerfile to build the image and simply run it
 
 ### Infos 
 
-requires python3.7
+requires python3.8
 
 - Supports illimted lifetime secret
 
@@ -32,3 +32,5 @@ requires python3.7
 - Add support for AES_CTR
 - Add support for AES_CBC
 - Fix tests
+- add icon
+- add docker hub overview

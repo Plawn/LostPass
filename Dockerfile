@@ -15,8 +15,12 @@ FROM python:3.8.6-slim
 
 WORKDIR /api
 
-RUN apt update \
-    && apt install nginx redis -y 
+RUN apt update 
+RUN apt install nginx redis -y 
+
+# clean apt cache
+RUN rm -rf /var/lib/apt/lists/*
+RUN rm -rf /var/cache/apt/archives
 
 RUN pip install gunicorn uvloop httptools
 
