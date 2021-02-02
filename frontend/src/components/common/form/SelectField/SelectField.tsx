@@ -54,23 +54,23 @@ const useStyles = makeStyles((theme: Theme) => ({
 /**
  * /!\ Warning this component may break with formik updates
  */
-const SelectField = <T extends {}>(props: Props<T>) => {
-	const { options } = props;
+function SelectField<T>(props: Props<T>) {
+	const { options, form, onChange, label, style } = props;
 	const [value, setValue] = useState(props.initialValue || "");
 
 	const renderedOptions = useMemo(() => options.map(e => ({ label: e.label, value: e })), [options]);
 
 	const handleChange = (event: ChangeEvent<{ label?: string; value: { label: string; value: T } }>) => {
 		setValue(event.target.value.label || "");
-		props.form && props.form.setFieldValue(props.field!.name, event.target.value.value, true);
-		props.onChange && props.onChange(event);
+		form && form.setFieldValue(props.field!.name, event.target.value.value, true);
+		onChange && onChange(event);
 	};
 	const classes = useStyles();
 	const uid = useUID();
 	return (
-		<FormControl variant="outlined" margin="dense" className={classes.formControl} style={props.style}>
+		<FormControl variant="outlined" margin="dense" className={classes.formControl} style={style}>
 			<InputLabel classes={{ root: classes.inputLabel }} htmlFor={uid}>
-				{props.label}
+				{label}
 			</InputLabel>
 			<Select
 				id={uid}
@@ -78,7 +78,7 @@ const SelectField = <T extends {}>(props: Props<T>) => {
 				value={value}
 				classes={{ icon: classes.icon }}
 				renderValue={(value: any) => <>{value.label || value}</>}
-				label={props.label}
+				label={label}
 			>
 				{renderedOptions.map((option: any) => (
 					<MenuItem value={option.value} className={classes.menuItem} key={option.label}>
