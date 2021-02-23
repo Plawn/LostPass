@@ -29,8 +29,6 @@ requires python3.8
 ## TODO
 
 - Add file share 
-- Add support for AES_CTR
-- Add support for AES_CBC
 - Fix tests
 - add icon
 - add docker hub overview
