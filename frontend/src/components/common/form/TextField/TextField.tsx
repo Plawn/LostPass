@@ -1,11 +1,8 @@
-import React from 'react';
 import { TextField, TextFieldProps } from '@material-ui/core';
+import React from 'react';
 
 
-
-
-
-export default (props: TextFieldProps) => (
+const LostTextField = (props: TextFieldProps) => (
     <TextField
         {...props}
         inputProps={{ style: { textAlign: 'center', ...props.style } }}
@@ -14,3 +11,4 @@ export default (props: TextFieldProps) => (
     />
 )
 
+export default LostTextField;
