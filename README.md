@@ -1,34 +1,28 @@
 # LostPass
 
-### How to run it ?
+## What is it ?
 
-Without docker 
+If you need to send secret data to another user, but can't trust your echange medium you can use this app.
 
-Run a redis, with the default user and use the configuration file to setup it with the application
+This app will store an encrypted version of your secret and return tokens containing the passphrase to you. You can then send this link to your friend and he will be able to use it only once. The data will then be erased from the database.
 
-use the start_standalone.sh script to start the app
+## How to use it ?
 
-With docker
+You can either use the complete Dockerfile, or use the Dockerfile and an external redis database.
 
-Run a redis, in a container
-
-use the configuration file to setup it with the application and don't forget to mount it, in the container
-
-use the Dockerfile to build the image and simply run it
-
-### Infos 
+### Infos
 
 requires python3.8
 
 - Supports illimted lifetime secret
 
-- Supported Modes
-    - AES_GCM (256)
-    - FERNET
+- Supported Modes :
+  - AES_GCM (256)
+  - FERNET
 
 ## TODO
 
-- Add file share 
+- Add file share
 - Fix tests
 - add icon
 - add docker hub overview

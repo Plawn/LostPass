@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { RouteComponentProps } from 'react-router-dom';
 import { LoadingComponent } from '../../common/LoadingComponent/LoadingComponent';
-import { verifyToken } from '../../../api/api';
+import { verifyToken, VerifyTokenDto } from '../../../api/api';
 import InvalidToken from './invalidToken';
 import ValidToken from './validToken';
 
@@ -11,18 +11,22 @@ type RouteParams = {
 
 type Props = RouteComponentProps<RouteParams>;
 
-const TokenViewer = ({ valid, token }: { valid?: boolean; token: string }) => (valid ? <ValidToken token={token} /> : <InvalidToken />)
+const TokenViewer = ({ data, token }: { data?: VerifyTokenDto; token: string }) => {
+    return (data?.valid ? <ValidToken meta={data.meta} token={token} /> : <InvalidToken />)
+}
+
+
 
 const ViewToken = (props: Props) => {
     const token = props.match.params.token;
     const [loading, setLoading] = useState(false);
-    const [valid, setValid] = useState<boolean | undefined>(undefined);
+    const [data, setData] = useState<VerifyTokenDto>();
 
     const loadData = useCallback(() => {
         setLoading(true);
         verifyToken(token)
-            .then(isValid => setValid(isValid))
-            .catch(() => setValid(false))
+            .then(setData)
+            .catch(() => setData({ valid: false, meta: { type: 0 } }))
             .finally(() => setLoading(false));
     }, [token]);
 
@@ -31,8 +35,8 @@ const ViewToken = (props: Props) => {
     }, [loadData]);
 
     return (
-        <LoadingComponent loading={loading || valid === undefined}>
-            <TokenViewer valid={valid} token={token} />
+        <LoadingComponent loading={loading || data === undefined}>
+            <TokenViewer data={data} token={token} />
         </LoadingComponent>
     );
 }

@@ -1,10 +1,11 @@
-import React, { Dispatch, memo, SetStateAction } from 'react';
-import { createToken } from '../../../api/api';
+import React, { Dispatch, memo, SetStateAction, useState } from 'react';
+import { createTokenForFile, createTokenForString } from '../../../api/api';
 import SelectField from '../../common/form/SelectField/SelectField';
 import { Form, Field, Formik } from 'formik';
 import { FormikTextField, FormikMultiLineTextField } from '../../common/form/FormikTextField/FormikTextField';
 import { range } from '../../../utils/utils';
 import { Button, Typography } from '@material-ui/core';
+import { DropzoneArea } from 'material-ui-dropzone';
 
 type setState<T> = Dispatch<SetStateAction<T>>;
 
@@ -36,13 +37,35 @@ type Props = {
 
 const TokenForm = memo(({ setTokens, setLoading }: Props) => {
 
-    const handleTokenCreation = async (content: string, ttl: number, linksNumber: number) => {
+    const [usingFile, setUsingFile] = useState(true);
+    const [selectedFile, setSelectedFile] = useState<File>();
+    const handleTokenCreationForString = async (content: string, ttl: number, linksNumber: number) => {
         setTokens([]);
         setLoading(true);
-        createToken(content, ttl, linksNumber)
+        createTokenForString(content, ttl, linksNumber)
             .then(setTokens)
+            .catch((e) => {
+                console.error('Failed to make token');
+            })
             .finally(() => setLoading(false));
     };
+
+    const handleTokenCreationForFile = async (content: File, ttl: number, linksNumber: number) => {
+        setTokens([]);
+        setLoading(true);
+        createTokenForFile(content, ttl, linksNumber)
+            .then(setTokens)
+            .catch((e) => {
+                console.error('Failed to make token');
+            })
+            .finally(() => setLoading(false));
+    };
+
+    const handleFile = (files: File[]) => {
+        if (files.length > 0) {
+            setSelectedFile(files[0]);
+        }
+    }
 
     return (
         <>
@@ -53,13 +76,25 @@ const TokenForm = memo(({ setTokens, setLoading }: Props) => {
                 initialValues={initialValues}
                 onSubmit={async values => {
                     if (values.ttl !== undefined) {
-                        handleTokenCreation(values.content, +values.ttl, +values.linksNumber);
+                        if (usingFile && selectedFile) {
+                            handleTokenCreationForFile(selectedFile, +values.ttl, +values.linksNumber);
+                        } else {
+                            handleTokenCreationForString(values.content, +values.ttl, +values.linksNumber);
+                        }
                     }
                 }}
             >
                 {() =>
                     <Form>
-                        <Field label="Content" name="content" placeholder="Enter your content here" component={FormikMultiLineTextField} />
+                        {usingFile ? (<>
+                            <DropzoneArea
+                                onChange={handleFile}
+                                clearOnUnmount
+                                filesLimit={1}
+                            />
+                        </>) : (
+                                <Field label="Content" name="content" placeholder="Enter your content here" component={FormikMultiLineTextField} />
+                            )}
                         <div>
                             <Typography variant="h6">
                                 TTL

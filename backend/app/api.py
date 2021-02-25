@@ -1,8 +1,10 @@
 import logging
-import os
+import io
 
-from fastapi import FastAPI
+from fastapi import FastAPI, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.responses import StreamingResponse
+from fastapi.param_functions import Form
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, PositiveInt, conint
 from starlette.responses import FileResponse, JSONResponse
@@ -45,12 +47,34 @@ def make_error(msg: str, code: int = 400):
     #         return send_from_directory(app.static_folder, 'index.html')
 
 
-@app.post('/api/new')
+@app.post('/api/new/string')
 def create_token(body: NewTokenDTO):
+    meta = {}
     tokens, used = token_handler.set_string(
         body.content, body.ttl,
         nb_token=body.links_number,
-        expires=body.ttl != 0
+        expires=body.ttl != 0,
+        meta=meta
+    )
+    return {
+        'tokens': tokens,
+        'used': used,
+    }
+
+
+@app.post('/api/new/file')
+async def create_token_files(
+    ttl: int = Form(...),
+    links_number: int = Form(...),
+    file: UploadFile = File(...)
+):
+    meta = {'filename': file.filename}
+    content = await file.read()
+    tokens, used = token_handler.set_bytes(
+        content, ttl,
+        nb_tokens=links_number,
+        expires=ttl != 0,
+        meta=meta,
     )
     return {
         'tokens': tokens,
@@ -63,19 +87,29 @@ def preview(token: str):
     """just check if the token is valid here
     """
     try:
+        valid, metadata = token_handler.is_token_valid(url_unquote_plus(token))
         return {
-            'valid': token_handler.is_token_valid(url_unquote_plus(token))
+            'valid': valid,
+            'meta': metadata,
         }
     except InvalidToken:
         return make_error('Invalid token')
 
 
 @app.get('/api/view/{token}')
-def view_password(token: str):
+def view_data(token: str):
     try:
-        return {
-            'content': token_handler.get_string(url_unquote_plus(token))
-        }
+        data, metadata = token_handler.get_bytes(url_unquote_plus(token))
+        if metadata['type'] == 1:
+            return {
+                'content': data.decode('utf-8')
+            }
+        else:
+            file_like = io.BytesIO()
+            file_like.write(data)
+            file_like.seek(0)
+            return StreamingResponse(file_like, media_type='application/octet-stream')
+
     except InvalidToken:
         return make_error('Invalid token')
 
