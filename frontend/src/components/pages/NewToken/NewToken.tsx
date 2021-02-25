@@ -17,7 +17,6 @@ const CopyAllLinks = memo(({ urls }: { urls: string[] }) => (
     </div>
 ));
 
-
 const NewToken = () => {
     const [tokens, setTokens] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
