@@ -6,6 +6,7 @@ import MultiLineTextField from '../../common/form/MultiLineTextField/MultiLineTe
 import { retrieveBytesContent, retrieveStringContent } from '../../../api/api';
 import CheckCircleOutlinedIcon from '@material-ui/icons/CheckCircleOutlined';
 
+
 const ValidToken = memo(({ token, meta }: { token: string, meta: { type: 0 | 1, filename?: string } }) => {
     const [content, setContent] = useState<string | undefined>(undefined);
     const [loading, setLoading] = useState(false);
