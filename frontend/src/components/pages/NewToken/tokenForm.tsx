@@ -4,7 +4,7 @@ import SelectField from '../../common/form/SelectField/SelectField';
 import { Form, Field, Formik } from 'formik';
 import { FormikTextField, FormikMultiLineTextField } from '../../common/form/FormikTextField/FormikTextField';
 import { range } from '../../../utils/utils';
-import { Button, Typography } from '@material-ui/core';
+import { Button, Typography, Switch, FormLabel } from '@material-ui/core';
 import { DropzoneArea } from 'material-ui-dropzone';
 
 type setState<T> = Dispatch<SetStateAction<T>>;
@@ -37,7 +37,7 @@ type Props = {
 
 const TokenForm = memo(({ setTokens, setLoading }: Props) => {
 
-    const [usingFile, setUsingFile] = useState(true);
+    const [usingFile, setUsingFile] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File>();
     const handleTokenCreationForString = async (content: string, ttl: number, linksNumber: number) => {
         setTokens([]);
@@ -72,6 +72,11 @@ const TokenForm = memo(({ setTokens, setLoading }: Props) => {
             <Typography variant="h3">
                 Share Secret Data
             </Typography>
+            <div>
+                <FormLabel>Text</FormLabel>
+                <Switch checked={usingFile} onChange={e => setUsingFile(e.target.checked)} />
+                <FormLabel>File</FormLabel>
+            </div>
             <Formik
                 initialValues={initialValues}
                 onSubmit={async values => {

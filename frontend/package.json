@@ -52,12 +52,5 @@
         "hooks": {
             "pre-commit": "lint-staged"
         }
-    },
-    "lint-staged": {
-        "**/*": "prettier --write --ignore-unknown"
-    },
-    "devDependencies": {
-        "husky": "^5.1.1",
-        "prettier": "^2.2.1"
     }
 }
