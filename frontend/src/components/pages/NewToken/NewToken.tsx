@@ -8,7 +8,6 @@ import TokenForm from './tokenForm';
 
 const makeViewLink = (token: string) => document.location.origin + `/view/${encodeURIComponent(token)}`;
 
-
 const CopyAllLinks = memo(({ urls }: { urls: string[] }) => (
     <div>
         <Typography style={{ display: 'inline' }}>
@@ -17,7 +16,6 @@ const CopyAllLinks = memo(({ urls }: { urls: string[] }) => (
         <CopyToClipboard string={urls.join("\n")} />
     </div>
 ));
-
 
 
 const NewToken = () => {
