@@ -22,7 +22,6 @@ requires python3.8
 
 ## TODO
 
-- Add file share
 - Fix tests
 - add icon
 - add docker hub overview
